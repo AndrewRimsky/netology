@@ -1,25 +1,23 @@
-name: Node.js CI
-
-on:
-  push:
-    branches:
-      - master
-
+name: Build and Deploy
+on: [push]
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x]
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: |
+          persist-credentials: false
+
+      - name: Install and Build
+        run: |
+          npm install
           npm run build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: dist
+          CLEAN: true
